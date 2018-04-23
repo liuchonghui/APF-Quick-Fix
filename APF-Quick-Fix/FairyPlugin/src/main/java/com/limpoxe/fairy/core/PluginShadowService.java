@@ -5,6 +5,7 @@ import android.app.Service;
 import android.content.Context;
 import android.content.Intent;
 import android.os.IBinder;
+import android.util.Log;
 
 import com.limpoxe.fairy.core.android.HackContextImpl;
 import com.limpoxe.fairy.core.android.HackService;
@@ -53,9 +54,9 @@ public class PluginShadowService extends Service {
 			Class clazz = PluginLoader.loadPluginClassByName(realName);
 			realService = (Service) clazz.newInstance();
 		} catch (Exception e) {
-			throw new RuntimeException(
-					"Unable to instantiate service " + mClassName
-							+ ", realName " + realName + " : " + e.toString(), e);
+			String message = "Unable to instantiate service " + mClassName + ", realName " + realName + " : " + e.toString();
+			Log.d(getClass().getSimpleName(), message);
+//			throw new RuntimeException(message, e);
 		}
 
 		try {
@@ -69,9 +70,9 @@ public class PluginShadowService extends Service {
 
 			realService.onCreate();
 		} catch (Exception e) {
-			throw new RuntimeException(
-					"Unable to create service " + mClassName
-							+ ": " + e.toString(), e);
+			String message = "Unable to create service " + mClassName + ": " + e.toString();
+			Log.d(getClass().getSimpleName(), message);
+//			throw new RuntimeException(message, e);
 		}
 	}
 
