@@ -1,6 +1,8 @@
 package com.limpoxe.fairy.core;
 
 import android.app.Application;
+import android.content.ComponentName;
+import android.content.Intent;
 
 import com.limpoxe.fairy.manager.mapping.StubMappingProcessor;
 import com.limpoxe.fairy.util.LogUtil;
@@ -118,4 +120,37 @@ public class FairyGlobal {
         sSupportRemoteViews = support;
     }
 
+    private static PluginFilter sPluginFilter;
+
+    public static void setPluginFilter(PluginFilter filter) {
+        sPluginFilter = filter;
+    }
+
+    public static boolean filterPlugin(String packageName) {
+        if (sPluginFilter != null) {
+            return sPluginFilter.accept(packageName);
+        }
+        return false;
+    }
+
+    public static boolean filterPlugin(ComponentName componentName) {
+        if (sPluginFilter != null) {
+            String packageName = componentName != null ? componentName.getPackageName() : null;
+            return sPluginFilter.accept(packageName);
+        }
+        return false;
+    }
+
+    public static boolean filterPlugin(Intent intent) {
+        if (sPluginFilter != null && intent != null) {
+            String packageName1 = intent.getPackage();
+            String packageName2 = null;
+            ComponentName componentName = intent.getComponent();
+            if (componentName != null) {
+                packageName2 = componentName.getPackageName();
+            }
+            return sPluginFilter.accept(packageName1) || sPluginFilter.accept(packageName2);
+        }
+        return false;
+    }
 }
