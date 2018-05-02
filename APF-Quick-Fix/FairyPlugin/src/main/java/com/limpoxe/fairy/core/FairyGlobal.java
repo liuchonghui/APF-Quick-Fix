@@ -117,6 +117,10 @@ public class FairyGlobal {
         sPluginFilter = filter;
     }
 
+    public static boolean hasPluginFilter() {
+        return sPluginFilter != null;
+    }
+
     public static boolean filterPlugin(String packageName) {
         if (sPluginFilter != null) {
             return sPluginFilter.accept(packageName);
