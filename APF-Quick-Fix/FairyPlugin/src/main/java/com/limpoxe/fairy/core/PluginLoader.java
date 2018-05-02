@@ -11,6 +11,7 @@ import android.content.pm.PackageManager;
 import android.os.Build;
 import android.os.Bundle;
 import android.os.Handler;
+import android.util.Log;
 
 import com.limpoxe.fairy.content.LoadedPlugin;
 import com.limpoxe.fairy.content.PluginDescriptor;
@@ -83,9 +84,13 @@ public class PluginLoader {
             });
         }
 
-        PluginInjector.injectHandlerCallback();//本来宿主进程是不需要注入handlecallback的，这里加上是为了对抗360安全卫士等软件，提高Instrumentation的成功率
-        PluginInjector.injectInstrumentation();
-        PluginInjector.injectBaseContext(FairyGlobal.getHostApplication());
+        boolean hasFilter = FairyGlobal.hasPluginFilter();
+        Log.d("PPP", "initLoader|hasFilter|" + hasFilter + "|isPluginProcess|" + isPluginProcess);
+        if (!hasFilter || (hasFilter && isPluginProcess)) {
+            PluginInjector.injectHandlerCallback();//本来宿主进程是不需要注入handlecallback的，这里加上是为了对抗360安全卫士等软件，提高Instrumentation的成功率
+            PluginInjector.injectInstrumentation();
+            PluginInjector.injectBaseContext(FairyGlobal.getHostApplication());
+        }
 
         if (isPluginProcess) {
             if (Build.VERSION.SDK_INT >= 14) {
