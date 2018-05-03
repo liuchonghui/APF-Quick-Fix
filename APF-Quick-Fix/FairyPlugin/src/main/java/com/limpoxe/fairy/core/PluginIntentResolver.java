@@ -5,6 +5,7 @@ import android.content.Context;
 import android.content.Intent;
 import android.content.pm.ServiceInfo;
 import android.os.Build;
+import android.util.Log;
 
 import com.limpoxe.fairy.content.PluginActivityInfo;
 import com.limpoxe.fairy.content.PluginDescriptor;
@@ -29,6 +30,7 @@ public class PluginIntentResolver {
     public static final String CLASS_PREFIX_SERVICE_NOT_FOUND = CLASS_PREFIX_SERVICE + "NOT_FOUND";
 
     public static void resolveService(Intent intent) {
+        Log.d("APF", "resolveService");
 		ArrayList<String> classNameList = matchPlugin(intent, PluginDescriptor.SERVICE);
 		if (classNameList != null && classNameList.size() > 0) {
             //TODO 只取第一个，忽略了多Service匹配到同一个Intent的情况
@@ -47,6 +49,7 @@ public class PluginIntentResolver {
 	}
 
 	public static ArrayList<Intent> resolveReceiver(final Intent intent) {
+        Log.d("APF", "resolveReceiver");
 		// 如果在插件中发现了匹配intent的receiver项目，替换掉ClassLoader
 		// 不需要在这里记录目标className，className将在Intent中传递
 		ArrayList<Intent> result = new ArrayList<Intent>();
@@ -78,7 +81,7 @@ public class PluginIntentResolver {
 	}
 
 	/* package */static Context resolveReceiverForClassLoader(final Object msgObj) {
-
+        Log.d("APF", "resolveReceiverForClassLoader");
         if (ProcessUtil.isPluginProcess()) {
 
             PluginInjector.hackHostClassLoaderIfNeeded();
@@ -142,7 +145,7 @@ public class PluginIntentResolver {
 	}
 
 	/* package */static String resolveServiceForClassLoader(Object msgObj) {
-
+        Log.d("APF", "resolveServiceForClassLoader");
 		HackCreateServiceData hackCreateServiceData = new HackCreateServiceData(msgObj);
 		ServiceInfo info = hackCreateServiceData.getInfo();
 
@@ -178,6 +181,7 @@ public class PluginIntentResolver {
 	}
 
 	public static void resolveActivity(final Intent intent) {
+        Log.d("APF", "resolveActivity");
 		// 如果在插件中发现Intent的匹配项，记下匹配的插件Activity的ClassName
 		ArrayList<String> classNameList = matchPlugin(intent, PluginDescriptor.ACTIVITY);
 		if (classNameList != null && classNameList.size() > 0) {
