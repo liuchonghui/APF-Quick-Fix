@@ -1,4 +1,4 @@
 # APF-Quick-Fix
 ```
-compile 'tools.android:FairyPlugin:0.0.59-quickfix'
+compile 'tools.android:FairyPlugin:0.0.59.4-quickfix'
 ```
