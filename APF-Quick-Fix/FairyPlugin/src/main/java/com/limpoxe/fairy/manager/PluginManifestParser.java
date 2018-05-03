@@ -1,15 +1,18 @@
-package com.limpoxe.fairy.core;
+package com.limpoxe.fairy.manager;
 
 import android.app.Application;
 import android.content.pm.ActivityInfo;
+import android.os.Bundle;
 import android.text.TextUtils;
 
 import com.limpoxe.fairy.content.PluginActivityInfo;
 import com.limpoxe.fairy.content.PluginDescriptor;
 import com.limpoxe.fairy.content.PluginIntentFilter;
 import com.limpoxe.fairy.content.PluginProviderInfo;
+import com.limpoxe.fairy.core.FairyGlobal;
 import com.limpoxe.fairy.util.LogUtil;
 import com.limpoxe.fairy.util.ManifestReader;
+import com.limpoxe.fairy.util.ResourceUtil;
 
 import org.xmlpull.v1.XmlPullParser;
 import org.xmlpull.v1.XmlPullParserException;
@@ -58,30 +61,35 @@ public class PluginManifestParser {
                             String useHostPackageName = parser.getAttributeValue(null, "useHostPackageName");
                             String versionCode = parser.getAttributeValue(namespaceAndroid, "versionCode");
                             String versionName = parser.getAttributeValue(namespaceAndroid, "versionName");
-                            String platformBuildVersionCode = parser.getAttributeValue(namespaceAndroid, "platformBuildVersionCode");
-                            String platformBuildVersionName = parser.getAttributeValue(namespaceAndroid, "platformBuildVersionName");
+                            String platformBuildVersionCode = parser.getAttributeValue(null, "platformBuildVersionCode");
+                            String platformBuildVersionName = parser.getAttributeValue(null, "platformBuildVersionName");
 
                             //用这个字段来标记apk是独立apk，还是需要依赖主程序的class和resource
                             //当这个值等于宿主程序packageName时，则认为这个插件是需要依赖宿主的class和resource的
-                            String sharedUserId = parser.getAttributeValue(namespaceAndroid, "sharedUserId");
+                            String hostApplicationId = parser.getAttributeValue(null, "hostApplicationId");
+                            if (hostApplicationId == null) {
+                                hostApplicationId = parser.getAttributeValue(namespaceAndroid, "sharedUserId");
+                            }
 
                             //这个字段用来标记非独立插件以来的宿主版本号，即此当前插件仅可运行在此版本的宿主中
                             //独立插件忽略此项
                             String requiredHostVersionName = parser.getAttributeValue(null, "requiredHostVersionName");
+                            String requiredHostVersionCode = parser.getAttributeValue(null, "requiredHostVersionCode");
 
                             desciptor.setPackageName(packageName);
-                            desciptor.setVersion(versionName + "_" + versionCode);
+                            desciptor.setVersionName(versionName);
+                            desciptor.setVersionCode(versionCode);
                             desciptor.setPlatformBuildVersionCode(platformBuildVersionCode);
                             desciptor.setPlatformBuildVersionName(platformBuildVersionName);
 
-                            desciptor.setStandalone(sharedUserId == null || !FairyGlobal.getHostApplication().getPackageName().equals(sharedUserId));
+                            desciptor.setStandalone(hostApplicationId == null || !FairyGlobal.getHostApplication().getPackageName().equals(hostApplicationId));
                             if (!desciptor.isStandalone() && !TextUtils.isEmpty(requiredHostVersionName)) {
                                 desciptor.setRequiredHostVersionName(requiredHostVersionName);
                             }
 
                             desciptor.setUseHostPackageName("true".equals(useHostPackageName));
 
-                            LogUtil.v(packageName, versionCode, versionName, sharedUserId);
+                            LogUtil.v(packageName, versionCode, versionName, hostApplicationId, FairyGlobal.getHostApplication().getPackageName());
                         } else if ("uses-sdk".equals(tag))  {
 
                             String minSdkVersion = parser.getAttributeValue(namespaceAndroid, "minSdkVersion");
@@ -94,27 +102,20 @@ public class PluginManifestParser {
 
                         	String name = parser.getAttributeValue(namespaceAndroid, "name");
                         	String value = parser.getAttributeValue(namespaceAndroid, "value");
+                            String resource = parser.getAttributeValue(namespaceAndroid, "resource");
 
                             if (name != null) {
 
-//                                HashMap<String, String> metaData = desciptor.getMetaData();
-//                                if (metaData == null) {
-//                                    metaData = new HashMap<String, String>();
-//                                    desciptor.setMetaData(metaData);
-//                                }
-//                                if (value != null && value.startsWith("@") && value.length() == 9) {
-//                                    String idHex = value.replace("@", "");
-//                                    try {
-//                                        int id = Integer.parseInt(idHex, 16);
-//                                        value = Integer.toString(id);
-//                                    } catch (Exception e) {
-//                                        e.printStackTrace();
-//                                    }
-//                                }
-//                                metaData.put(name, value);
+                                if (value != null && value.startsWith("@")) {
+                                    //等插件初始化的时候再处理这类meta信息
+                                    desciptor.getMetaDataTobeInflate().put(name, value);
+                                } else if (value != null) {
+                                    desciptor.getMetaDataString().put(name, value);
+                                } else if (resource != null && resource.startsWith("@")) {
+                                    desciptor.getMetaDataResource().put(name, ResourceUtil.parseResId(resource));
+                                }
 
-                                LogUtil.v("meta-data", name, value);
-
+                                LogUtil.v("meta-data", name, value, resource);
                             }
 
                         } else if ("exported-fragment".equals(tag)) {
@@ -158,11 +159,14 @@ public class PluginManifestParser {
                         } else if ("uses-library".equals(tag)) {
 
                             String name = parser.getAttributeValue(namespaceAndroid, "name");
-
-                            if (dependencies == null) {
-                                dependencies = new ArrayList<String>();
+                            if (name.startsWith("com.google") || name.startsWith("com.sec.android") || name.startsWith("com.here.android")) {
+                                LogUtil.d("uses-library ignore", name);
+                            } else {
+                                if (dependencies == null) {
+                                    dependencies = new ArrayList<String>();
+                                }
+                                dependencies.add(name);
                             }
-                            dependencies.add(name);
 
                         } else if ("application".equals(tag)) {
                         	
@@ -260,6 +264,7 @@ public class PluginManifestParser {
                             name = getName(name, packageName);
                             String author = parser.getAttributeValue(namespaceAndroid, "authorities");
                             String exported = parser.getAttributeValue(namespaceAndroid, "exported");
+                            String grantUriPermissions = parser.getAttributeValue(namespaceAndroid, "grantUriPermissions");
                             HashMap<String, PluginProviderInfo> providers = desciptor.getProviderInfos();
                             if (providers == null) {
                                 providers = new HashMap<String, PluginProviderInfo>();
@@ -268,10 +273,12 @@ public class PluginManifestParser {
 
                             PluginProviderInfo info = new PluginProviderInfo();
                             info.setName(name);
-                            info.setExported(Boolean.getBoolean(exported));
+                            info.setExported("true".equals(exported));
                             info.setAuthority(author);
-
+                            info.setGrantUriPermissions("true".equals(grantUriPermissions));
                             providers.put(name, info);
+
+                            LogUtil.d(name, info.isGrantUriPermissions(), grantUriPermissions, author, exported);
                         }
                         break;
                     }

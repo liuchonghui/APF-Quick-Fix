@@ -11,7 +11,6 @@ import android.content.pm.PackageManager;
 import android.os.Build;
 import android.os.Bundle;
 import android.os.Handler;
-import android.util.Log;
 
 import com.limpoxe.fairy.content.LoadedPlugin;
 import com.limpoxe.fairy.content.PluginDescriptor;
@@ -24,7 +23,7 @@ import com.limpoxe.fairy.core.proxy.systemservice.AndroidAppIPackageManager;
 import com.limpoxe.fairy.core.proxy.systemservice.AndroidOsServiceManager;
 import com.limpoxe.fairy.core.proxy.systemservice.AndroidWebkitWebViewFactoryProvider;
 import com.limpoxe.fairy.manager.PluginManagerHelper;
-import com.limpoxe.fairy.manager.PluginProviderClient;
+import com.limpoxe.fairy.manager.PluginManagerProviderClient;
 import com.limpoxe.fairy.manager.mapping.StubActivityMappingProcessor;
 import com.limpoxe.fairy.manager.mapping.StubReceiverMappingProcessor;
 import com.limpoxe.fairy.manager.mapping.StubServiceMappingProcessor;
@@ -84,13 +83,9 @@ public class PluginLoader {
             });
         }
 
-        boolean hasFilter = FairyGlobal.hasPluginFilter();
-        Log.d("APF", "initLoader|hasFilter" + hasFilter + "|isPluginProcess|" + isPluginProcess);
-        if (!hasFilter) {
-            PluginInjector.injectHandlerCallback();//本来宿主进程是不需要注入handlecallback的，这里加上是为了对抗360安全卫士等软件，提高Instrumentation的成功率
-            PluginInjector.injectInstrumentation();
-            PluginInjector.injectBaseContext(FairyGlobal.getHostApplication());
-        }
+        PluginInjector.injectHandlerCallback();//本来宿主进程是不需要注入handlecallback的，这里加上是为了对抗360安全卫士等软件，提高Instrumentation的成功率
+        PluginInjector.injectInstrumentation();
+        PluginInjector.injectBaseContext(FairyGlobal.getHostApplication());
 
         if (isPluginProcess) {
             if (Build.VERSION.SDK_INT >= 14) {
@@ -124,7 +119,7 @@ public class PluginLoader {
                         Intent intent = activity.getIntent();
                         if (intent != null && intent.getComponent() != null) {
                             LogUtil.v("回收绑定关系");
-                            PluginProviderClient.unBindLaunchModeStubActivity(intent.getComponent().getClassName(), activity.getClass().getName());
+                            PluginManagerProviderClient.unBindLaunchModeStubActivity(intent.getComponent().getClassName(), activity.getClass().getName());
                         }
                     }
                 });

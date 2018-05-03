@@ -9,13 +9,11 @@ import android.content.pm.Signature;
 import android.os.Build;
 import android.text.TextUtils;
 import android.util.Base64;
-import android.util.Log;
 
 import com.limpoxe.fairy.content.PluginDescriptor;
 import com.limpoxe.fairy.core.FairyGlobal;
 import com.limpoxe.fairy.core.PluginCreator;
 import com.limpoxe.fairy.core.PluginLauncher;
-import com.limpoxe.fairy.core.PluginManifestParser;
 import com.limpoxe.fairy.core.localservice.LocalServiceManager;
 import com.limpoxe.fairy.util.FileUtil;
 import com.limpoxe.fairy.util.LogUtil;
@@ -35,7 +33,7 @@ import java.util.Iterator;
 import java.util.Map;
 import java.util.Set;
 
-class PluginManagerImpl {
+class PluginManagerService {
 
 	private static final String INSTALLED_KEY = "plugins.list";
 	private static final String PENDING_KEY = "plugins.pending";
@@ -43,7 +41,7 @@ class PluginManagerImpl {
 	private final Hashtable<String, PluginDescriptor> sInstalledPlugins = new Hashtable<String, PluginDescriptor>();
 	private final Hashtable<String, PluginDescriptor> sPendingPlugins = new Hashtable<String, PluginDescriptor>();
 
-	PluginManagerImpl() {
+	PluginManagerService() {
 		if (!ProcessUtil.isPluginProcess()) {
 			throw new IllegalAccessError("本类仅在插件进程使用");
 		}
@@ -112,7 +110,6 @@ class PluginManagerImpl {
 	}
 
 	synchronized boolean removeAll() {
-		PluginManagerHelper.clearLocalCache();
 		sInstalledPlugins.clear();
 		boolean isSuccess = savePlugins(INSTALLED_KEY, sInstalledPlugins);
 
@@ -122,7 +119,6 @@ class PluginManagerImpl {
 	}
 
 	synchronized int remove(String pluginId) {
-		PluginManagerHelper.clearLocalCache();
 
 		PluginDescriptor old = sInstalledPlugins.remove(pluginId);
 
@@ -206,7 +202,7 @@ class PluginManagerImpl {
             //解析相对路径，得到真实绝对路径
             srcPluginFile = srcFile.getCanonicalPath();
         } catch (IOException e) {
-			LogUtil.printException("PluginManagerImpl.installPlugin", e);
+			LogUtil.printException("PluginManagerService.installPlugin", e);
 			return new InstallResult(PluginManagerHelper.INSTALL_FAIL);
         }
 
@@ -260,7 +256,7 @@ class PluginManagerImpl {
                 PackageInfo pkgInfo = FairyGlobal.getHostApplication().getPackageManager().getPackageInfo(FairyGlobal.getHostApplication().getPackageName(), PackageManager.GET_SIGNATURES);
                 mainSignatures = pkgInfo.signatures;
             } catch (PackageManager.NameNotFoundException e) {
-				LogUtil.printException("PluginManagerImpl.installPlugin", e);
+				LogUtil.printException("PluginManagerService.installPlugin", e);
 			}
             if (!PackageVerifyer.isSignaturesSame(mainSignatures, pluginSignatures)) {
                 LogUtil.e("插件证书和宿主证书不一致", srcPluginFile);
@@ -285,7 +281,7 @@ class PluginManagerImpl {
                     return new InstallResult(PluginManagerHelper.HOST_VERSION_NOT_SUPPORT_CURRENT_PLUGIN, pluginDescriptor.getPackageName(), pluginDescriptor.getVersion());
                 }
             } catch (PackageManager.NameNotFoundException e) {
-				LogUtil.printException("PluginManagerImpl.installPlugin", e);
+				LogUtil.printException("PluginManagerService.installPlugin", e);
 			}
         }
 
@@ -342,13 +338,14 @@ class PluginManagerImpl {
 			//}
 
             //万事具备 添加到已安装插件列表
-            PackageInfo packageInfo = packageManager.getPackageArchiveInfo(destApkPath, PackageManager.GET_GIDS);
+			pluginDescriptor.setInstalledPath(destApkPath);
+            PackageInfo packageInfo = pluginDescriptor.getPackageInfo(PackageManager.GET_GIDS);
             if (packageInfo != null) {
                 pluginDescriptor.setApplicationTheme(packageInfo.applicationInfo.theme);
                 pluginDescriptor.setApplicationIcon(packageInfo.applicationInfo.icon);
                 pluginDescriptor.setApplicationLogo(packageInfo.applicationInfo.logo);
             }
-            pluginDescriptor.setInstalledPath(destApkPath);
+
 			boolean isInstallSuccess = addOrReplace(pluginDescriptor);
 
 			//删掉临时文件
@@ -369,7 +366,7 @@ class PluginManagerImpl {
 				try {
 					cl.loadClass(Object.class.getName());
 				} catch (ClassNotFoundException e) {
-					LogUtil.printException("PluginManagerImpl.installPlugin", e);
+					LogUtil.printException("PluginManagerService.installPlugin", e);
 				}
 				LogUtil.d("DEXOPT完毕");
 
@@ -412,20 +409,20 @@ class PluginManagerImpl {
 			getSharedPreference().edit().putString(key, list).commit();
 			return true;
 		} catch (Exception e) {
-			LogUtil.printException("PluginManagerImpl.savePlugins", e);
+			LogUtil.printException("PluginManagerService.savePlugins", e);
 		} finally {
 			if (objectOutputStream != null) {
 				try {
 					objectOutputStream.close();
 				} catch (IOException e) {
-					LogUtil.printException("PluginManagerImpl.savePlugins", e);
+					LogUtil.printException("PluginManagerService.savePlugins", e);
 				}
 			}
 			if (byteArrayOutputStream != null) {
 				try {
 					byteArrayOutputStream.close();
 				} catch (IOException e) {
-					LogUtil.printException("PluginManagerImpl.savePlugins", e);
+					LogUtil.printException("PluginManagerService.savePlugins", e);
 				}
 			}
 		}
@@ -444,20 +441,20 @@ class PluginManagerImpl {
 				objectInputStream = new ObjectInputStream(byteArrayInputStream);
 				object = (Serializable) objectInputStream.readObject();
 			} catch (Exception e) {
-				LogUtil.printException("PluginManagerImpl.readPlugins", e);
+				LogUtil.printException("PluginManagerService.readPlugins", e);
 			} finally {
 				if (objectInputStream != null) {
 					try {
 						objectInputStream.close();
 					} catch (IOException e) {
-						LogUtil.printException("PluginManagerImpl.readPlugins", e);
+						LogUtil.printException("PluginManagerService.readPlugins", e);
 					}
 				}
 				if (byteArrayInputStream != null) {
 					try {
 						byteArrayInputStream.close();
 					} catch (IOException e) {
-						LogUtil.printException("PluginManagerImpl.readPlugins", e);
+						LogUtil.printException("PluginManagerService.readPlugins", e);
 					}
 				}
 			}

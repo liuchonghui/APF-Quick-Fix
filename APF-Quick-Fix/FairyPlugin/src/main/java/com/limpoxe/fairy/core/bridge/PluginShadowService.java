@@ -1,12 +1,14 @@
-package com.limpoxe.fairy.core;
+package com.limpoxe.fairy.core.bridge;
 
 import android.app.Application;
 import android.app.Service;
 import android.content.Context;
 import android.content.Intent;
 import android.os.IBinder;
-import android.util.Log;
 
+import com.limpoxe.fairy.core.PluginInjector;
+import com.limpoxe.fairy.core.PluginIntentResolver;
+import com.limpoxe.fairy.core.PluginLoader;
 import com.limpoxe.fairy.core.android.HackContextImpl;
 import com.limpoxe.fairy.core.android.HackService;
 import com.limpoxe.fairy.util.LogUtil;
@@ -54,9 +56,9 @@ public class PluginShadowService extends Service {
 			Class clazz = PluginLoader.loadPluginClassByName(realName);
 			realService = (Service) clazz.newInstance();
 		} catch (Exception e) {
-			String message = "Unable to instantiate service " + mClassName + ", realName " + realName + " : " + e.toString();
-			Log.d(getClass().getSimpleName(), message);
-//			throw new RuntimeException(message, e);
+			throw new RuntimeException(
+					"Unable to instantiate service " + mClassName
+							+ ", realName " + realName + " : " + e.toString(), e);
 		}
 
 		try {
@@ -70,9 +72,9 @@ public class PluginShadowService extends Service {
 
 			realService.onCreate();
 		} catch (Exception e) {
-			String message = "Unable to create service " + mClassName + ": " + e.toString();
-			Log.d(getClass().getSimpleName(), message);
-//			throw new RuntimeException(message, e);
+			throw new RuntimeException(
+					"Unable to create service " + mClassName
+							+ ": " + e.toString(), e);
 		}
 	}
 
