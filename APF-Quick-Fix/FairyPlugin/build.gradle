@@ -8,7 +8,7 @@ android {
         minSdkVersion 9
         targetSdkVersion 27
         versionCode 59
-        versionName "0.0.59.4-quickfix"
+        versionName "0.0.59.5-quickfix"
     }
 
     lintOptions {
