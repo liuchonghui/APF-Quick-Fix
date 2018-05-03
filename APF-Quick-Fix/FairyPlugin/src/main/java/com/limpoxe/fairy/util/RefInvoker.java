@@ -55,14 +55,20 @@ public class RefInvoker {
 	}
 
 	public static Object invokeMethod(Object target, String className, String methodName, Class[] paramTypes,
-			Object[] paramValues) throws ClassNotFoundException, ActivityNotFoundException {
-
+			Object[] paramValues) {
+		try {
 			Class clazz = forName(className);
 			return invokeMethod(target, clazz, methodName, paramTypes, paramValues);
+		}catch (ClassNotFoundException e) {
+			new ClassNotFoundException(e.getMessage());
+		}catch (ActivityNotFoundException e) {
+			new ActivityNotFoundException(e.getMessage());
+		}
+		return null;
 	}
 
 	public static Object invokeMethod(Object target, Class clazz, String methodName, Class[] paramTypes,
-									  Object[] paramValues) throws ClassNotFoundException, ActivityNotFoundException {
+									  Object[] paramValues) {
 		try {
 			Method method = clazz.getDeclaredMethod(methodName, paramTypes);
 			if (!method.isAccessible()) {
@@ -79,6 +85,8 @@ public class RefInvoker {
 			LogUtil.printException("NoSuchMethodException", e);
 		} catch (InvocationTargetException e) {
 			LogUtil.printException("InvocationTargetException", e);
+		} catch (ActivityNotFoundException e) {
+			new ActivityNotFoundException(e.getMessage());
 		}
 		return null;
 	}
