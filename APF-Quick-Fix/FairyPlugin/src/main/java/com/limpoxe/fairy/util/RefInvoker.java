@@ -85,9 +85,11 @@ public class RefInvoker {
 			//这个日志...
 			LogUtil.e("NoSuchMethodException", methodName);
 		} catch (InvocationTargetException e) {
-			LogUtil.printException("InvocationTargetException", e);
-		} catch (ActivityNotFoundException e) {
-			new ActivityNotFoundException(e.getMessage());
+			if (e.getCause() instanceof ActivityNotFoundException) {
+				new ActivityNotFoundException(e.getCause().getMessage());
+			} else {
+				LogUtil.printException("InvocationTargetException", e);
+			}
 		}
 		return null;
 	}
