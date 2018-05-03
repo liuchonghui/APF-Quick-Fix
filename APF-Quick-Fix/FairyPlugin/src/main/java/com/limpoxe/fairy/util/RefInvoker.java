@@ -1,5 +1,7 @@
 package com.limpoxe.fairy.util;
 
+import android.content.ActivityNotFoundException;
+
 import java.lang.annotation.Annotation;
 import java.lang.reflect.Constructor;
 import java.lang.reflect.Field;
@@ -53,19 +55,14 @@ public class RefInvoker {
 	}
 
 	public static Object invokeMethod(Object target, String className, String methodName, Class[] paramTypes,
-			Object[] paramValues) {
+			Object[] paramValues) throws ClassNotFoundException, ActivityNotFoundException {
 
-		try {
 			Class clazz = forName(className);
 			return invokeMethod(target, clazz, methodName, paramTypes, paramValues);
-		}catch (ClassNotFoundException e) {
-			LogUtil.printException("ClassNotFoundException", e);
-		}
-		return null;
 	}
 
 	public static Object invokeMethod(Object target, Class clazz, String methodName, Class[] paramTypes,
-									  Object[] paramValues) {
+									  Object[] paramValues) throws ClassNotFoundException, ActivityNotFoundException {
 		try {
 			Method method = clazz.getDeclaredMethod(methodName, paramTypes);
 			if (!method.isAccessible()) {
