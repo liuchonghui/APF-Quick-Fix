@@ -86,7 +86,9 @@ public class PluginLoader {
 
         boolean hasFilter = FairyGlobal.hasPluginFilter();
         Log.d("APF", "initLoader|hasFilter" + hasFilter + "|isPluginProcess|" + isPluginProcess);
-        if (!hasFilter) {
+        if (!hasFilter || (hasFilter && isPluginProcess)) {
+            // 如果没有设置filter，注入
+            // 如果设置了filter，只有插件进程注入
             PluginInjector.injectHandlerCallback();//本来宿主进程是不需要注入handlecallback的，这里加上是为了对抗360安全卫士等软件，提高Instrumentation的成功率
             PluginInjector.injectInstrumentation();
             PluginInjector.injectBaseContext(FairyGlobal.getHostApplication());
