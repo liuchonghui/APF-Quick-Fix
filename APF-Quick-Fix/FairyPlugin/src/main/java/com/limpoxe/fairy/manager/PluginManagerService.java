@@ -1,5 +1,6 @@
 package com.limpoxe.fairy.manager;
 
+import android.compact.utils.MathCompactUtil;
 import android.content.Context;
 import android.content.SharedPreferences;
 import android.content.pm.ApplicationInfo;
@@ -289,6 +290,17 @@ class PluginManagerService {
 		PluginDescriptor oldPluginDescriptor = getPluginDescriptorByPluginId(pluginDescriptor.getPackageName());
 		if (oldPluginDescriptor != null) {
 			LogUtil.d("已安装过，安装路径为", oldPluginDescriptor.getInstalledPath(), oldPluginDescriptor.getVersion(), pluginDescriptor.getVersion());
+
+			if (!FairyGlobal.isAllowDowngrade()) {
+				// 不允许downgrade
+				long oldVersion = MathCompactUtil.getLongFromString(oldPluginDescriptor.getVersion());
+				long newVersion = MathCompactUtil.getLongFromString(pluginDescriptor.getVersion());
+				if (newVersion <= oldVersion && oldVersion != 0 && newVersion != 0) {
+					LogUtil.e("旧版插件已经存在， 且新版插件比旧版插件版本号小或相同，拒绝安装");
+					new File(srcPluginFile).delete();
+					return new InstallResult(PluginManagerHelper.FAIL_BECAUSE_HIGH_VER_HAS_LOADED, pluginDescriptor.getPackageName(), pluginDescriptor.getVersion());
+				}
+			}
 
 			//检查插件是否已经加载
 			if (PluginLauncher.instance().isRunning(oldPluginDescriptor.getPackageName())) {

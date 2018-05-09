@@ -25,6 +25,7 @@ public class PluginManagerHelper {
     public static final int MIN_API_NOT_SUPPORTED = 8;
     public static final int INSTALL_FAIL = 7;
     public static final int HOST_VERSION_NOT_SUPPORT_CURRENT_PLUGIN = 9;
+    public static final int FAIL_BECAUSE_HIGH_VER_HAS_LOADED = 10;
 
     public static final int PLUGIN_NOT_EXIST = 21;
     public static final int REMOVE_FAIL = 27;

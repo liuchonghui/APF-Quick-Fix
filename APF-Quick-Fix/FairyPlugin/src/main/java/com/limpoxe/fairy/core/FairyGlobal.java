@@ -17,6 +17,7 @@ public class FairyGlobal {
     private static long sMinLoadingTime = 400;
     private static boolean sIsNeedVerifyPluginSign = true;
     private static boolean sSupportRemoteViews = true;
+    private static boolean sIsAllowDowngrade = true;
     private static ArrayList<StubMappingProcessor> mappingProcessors = new ArrayList<StubMappingProcessor>();
 
     public static Application getHostApplication() {
@@ -90,6 +91,14 @@ public class FairyGlobal {
 
     public static boolean isNeedVerifyPlugin() {
         return sIsNeedVerifyPluginSign;
+    }
+
+    public static void setAllowDowngrade(boolean allowDowngrade) {
+        sIsAllowDowngrade = allowDowngrade;
+    }
+
+    public static boolean isAllowDowngrade() {
+        return sIsAllowDowngrade;
     }
 
     /**
