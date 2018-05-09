@@ -1,6 +1,5 @@
 package com.limpoxe.fairy.manager;
 
-import android.compact.utils.MathCompactUtil;
 import android.content.Context;
 import android.content.SharedPreferences;
 import android.content.pm.ApplicationInfo;
@@ -18,6 +17,7 @@ import com.limpoxe.fairy.core.PluginLauncher;
 import com.limpoxe.fairy.core.localservice.LocalServiceManager;
 import com.limpoxe.fairy.util.FileUtil;
 import com.limpoxe.fairy.util.LogUtil;
+import com.limpoxe.fairy.util.MathUtil;
 import com.limpoxe.fairy.util.PackageVerifyer;
 import com.limpoxe.fairy.util.ProcessUtil;
 
@@ -293,8 +293,8 @@ class PluginManagerService {
 
 			if (!FairyGlobal.isAllowDowngrade()) {
 				// 不允许downgrade
-				long oldVersion = MathCompactUtil.getLongFromString(oldPluginDescriptor.getVersion());
-				long newVersion = MathCompactUtil.getLongFromString(pluginDescriptor.getVersion());
+				long oldVersion = MathUtil.getLongFromString(oldPluginDescriptor.getVersion());
+				long newVersion = MathUtil.getLongFromString(pluginDescriptor.getVersion());
 				if (newVersion <= oldVersion && oldVersion != 0 && newVersion != 0) {
 					LogUtil.e("旧版插件已经存在， 且新版插件比旧版插件版本号小或相同，拒绝安装");
 					new File(srcPluginFile).delete();
