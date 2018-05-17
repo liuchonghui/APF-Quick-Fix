@@ -54,8 +54,12 @@ public class PluginShadowService extends Service {
 		try {
 			realName = mClassName.replace(PluginIntentResolver.CLASS_PREFIX_SERVICE, "");
 			LogUtil.v("className ", mClassName, "target", realName);
-			Class clazz = PluginLoader.loadPluginClassByName(realName);
-			realService = (Service) clazz.newInstance();
+			Log.d("APF", "className|" + mClassName + "|target|" + realName);
+			Class clazz = null;
+			if (realName != null && realName.length() > 0) {
+				clazz = PluginLoader.loadPluginClassByName(realName);
+				realService = (Service) clazz.newInstance();
+			}
 		} catch (Exception e) {
 			String message = "Unable to instantiate service " + mClassName + ", realName " + realName + " : " + e.toString();
 			Log.d(getClass().getSimpleName(), message);

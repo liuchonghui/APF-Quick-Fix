@@ -1,5 +1,7 @@
 package com.limpoxe.fairy.core.localservice;
 
+import android.util.Log;
+
 import com.limpoxe.fairy.content.LoadedPlugin;
 import com.limpoxe.fairy.content.PluginDescriptor;
 import com.limpoxe.fairy.core.FairyGlobal;
@@ -17,26 +19,49 @@ import java.util.Map;
  */
 public class LocalServiceManager {
 
+    static boolean isChecked = false;
     static boolean isSupport = false;
 
     static {
         try {
             Class ServiceManager = Class.forName("com.limpoxe.support.servicemanager.ServiceManager");
             isSupport = ServiceManager != null;
-        } catch (ClassNotFoundException e) {
+        } catch (Throwable t) {
+            isSupport = false;
             LogUtil.e("ServiceManager was disabled");
+            Log.d("APF", "ServiceManager was disabled, try and catches|" + t.getMessage());
         }
     }
 
+    private static void checkSupport() {
+        if (isChecked) {
+            return;
+        }
+        try {
+            Class ServiceManager = Class.forName("com.limpoxe.support.servicemanager.ServiceManager");
+            isSupport = ServiceManager != null;
+        } catch (Throwable t) {
+            isSupport = false;
+            LogUtil.e("ServiceManager was disabled");
+            Log.d("APF", "ServiceManager was disabled, try and catches|" + t.getMessage());
+        }
+        isChecked = true;
+    }
+
+    public static boolean isSupport() {
+        checkSupport();
+        return isSupport;
+    }
+
     public static void init() {
-        if (!isSupport) {
+        if (!isSupport()) {
             return;
         }
         ServiceManager.init(FairyGlobal.getHostApplication());
     }
 
     public static void registerService(PluginDescriptor plugin) {
-        if (!isSupport) {
+        if (!isSupport()) {
             return;
         }
         HashMap<String, String> localServices = plugin.getFunctions();
@@ -50,7 +75,7 @@ public class LocalServiceManager {
     }
 
     public static void registerService(final String pluginId, final String serviceName, final String serviceClass) {
-        if (!isSupport) {
+        if (!isSupport()) {
             return;
         }
         ServiceManager.publishService(serviceName, new ServicePool.ClassProvider() {
@@ -83,14 +108,14 @@ public class LocalServiceManager {
     }
 
     public static Object getService(String name) {
-        if (!isSupport) {
+        if (!isSupport()) {
             return null;
         }
         return ServiceManager.getService(name);
     }
 
     public static void unRegistService(PluginDescriptor plugin) {
-        if (!isSupport) {
+        if (!isSupport()) {
             return;
         }
         HashMap<String, String> localServices = plugin.getFunctions();
@@ -104,7 +129,7 @@ public class LocalServiceManager {
     }
 
     public static void unRegistAll() {
-        if (!isSupport) {
+        if (!isSupport()) {
             return;
         }
         ServiceManager.unPublishAllService();

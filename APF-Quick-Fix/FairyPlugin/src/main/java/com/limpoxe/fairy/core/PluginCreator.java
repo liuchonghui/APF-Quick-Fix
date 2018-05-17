@@ -4,6 +4,7 @@ import android.app.Application;
 import android.content.Context;
 import android.content.res.AssetManager;
 import android.content.res.Resources;
+import android.util.Log;
 
 import com.limpoxe.fairy.content.LoadedPlugin;
 import com.limpoxe.fairy.content.PluginDescriptor;
@@ -39,16 +40,40 @@ public class PluginCreator {
 		File libDir = new File(apkParentDir, "lib");
 		libDir.mkdirs();
 
+		try {
+			File path1 = new File(absolutePluginApkPath);
+			if (path1 == null || !path1.exists() || !path1.isDirectory()) {
+				Log.d("APF", "createPluginClassLoader|file|" + absolutePluginApkPath + "|illegal");
+			}
+			File path2 = new File(optDir.getAbsolutePath());
+			if (path2 == null || !path2.exists() || !path2.isDirectory()) {
+				Log.d("APF", "createPluginClassLoader|file|" + optDir.getAbsolutePath() + "|illegal");
+			}
+			File path3 = new File(libDir.getAbsolutePath());
+			if (path3 == null || !path3.exists() || !path3.isDirectory()) {
+				Log.d("APF", "createPluginClassLoader|file|" + libDir.getAbsolutePath() + "|illegal");
+			}
+		} catch (Throwable t) {
+			t.printStackTrace();
+		}
+
+		PluginClassLoader classLoader = null;
 		if (!isStandalone) {//非独立插件
-			return new PluginClassLoader(
+			try {
+				classLoader = new PluginClassLoader(
 					absolutePluginApkPath,
 					optDir.getAbsolutePath(),
 					libDir.getAbsolutePath(),
 					PluginLoader.class.getClassLoader(),//宿主classloader
 					dependences,//插件依赖的插件
 					null);
+			} catch (Throwable t) {
+				t.printStackTrace();
+				Log.d("APF", "[Un]StandAlone plugin load class fail|" + t.getMessage());
+			}
 		} else {//独立插件
-			return new PluginClassLoader(
+			try {
+				classLoader = new PluginClassLoader(
 					absolutePluginApkPath,
 					optDir.getAbsolutePath(),
 					libDir.getAbsolutePath(),
@@ -58,11 +83,16 @@ public class PluginCreator {
 			         * bootstrap class loader.
 			         */
 					ClassLoader.getSystemClassLoader().getParent(),//系统classloader
-                    dependences,//通常情况独立插件无子依赖, 此处参数size一般是0，但实际也可以依赖其他基础独立插件包，
-                                // 也即独立插件之间也可以建立依赖关系，前提和非独立插件一样，被依赖的插件不可以包含资源
+		    dependences,//通常情况独立插件无子依赖, 此处参数size一般是0，但实际也可以依赖其他基础独立插件包，
+					// 也即独立插件之间也可以建立依赖关系，前提和非独立插件一样，被依赖的插件不可以包含资源
 					pluginApkMultDexPath);
+			} catch (Throwable t) {
+				t.printStackTrace();
+				Log.d("APF", "StandAlone plugin load class fail|" + t.getMessage());
+			}
 		}
 
+		return classLoader;
 	}
 
 	/**
