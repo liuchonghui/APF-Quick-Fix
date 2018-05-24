@@ -25,6 +25,7 @@ public class PluginIntentFilter implements Serializable {
 	
 	private static final String SGLOB_STR = "sglob";
     private static final String PREFIX_STR = "prefix";
+    private static final String PREFIX_STR2 = "pathPrefix";
     private static final String LITERAL_STR = "literal";
     private static final String PATH_STR = "path";
     private static final String PORT_STR = "port";
@@ -1117,6 +1118,8 @@ public class PluginIntentFilter implements Serializable {
                 if (path != null) {
                     addDataPath(path, PluginPatternMatcher.PATTERN_LITERAL);
                 } else if ((path=parser.getAttributeValue(null, PREFIX_STR)) != null) {
+                    addDataPath(path, PluginPatternMatcher.PATTERN_PREFIX);
+                } else if ((path=parser.getAttributeValue(null, PREFIX_STR2)) != null) {
                     addDataPath(path, PluginPatternMatcher.PATTERN_PREFIX);
                 } else if ((path=parser.getAttributeValue(null, SGLOB_STR)) != null) {
                     addDataPath(path, PluginPatternMatcher.PATTERN_SIMPLE_GLOB);
