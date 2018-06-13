@@ -9,6 +9,7 @@ import android.content.pm.Signature;
 import android.os.Build;
 import android.text.TextUtils;
 import android.util.Base64;
+import android.util.Log;
 
 import com.limpoxe.fairy.content.PluginDescriptor;
 import com.limpoxe.fairy.core.FairyGlobal;
@@ -45,7 +46,7 @@ class PluginManagerService {
 	PluginManagerService() {
 		if (!ProcessUtil.isPluginProcess()) {
 //			throw new IllegalAccessError("本类仅在插件进程使用");
-			Log.e("APF", "IllegalAccessError|本类仅在插件进程使用@init PluginManagerImpl");
+			Log.e("APF", "IllegalAccessError|本类仅在插件进程使用@init PluginManagerService");
 		}
 	}
 
