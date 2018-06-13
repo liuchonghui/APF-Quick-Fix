@@ -17,6 +17,7 @@ import android.os.Bundle;
 import android.os.Handler;
 import android.os.IBinder;
 import android.os.Looper;
+import android.util.Log;
 
 import com.limpoxe.fairy.content.LoadedPlugin;
 import com.limpoxe.fairy.content.PluginDescriptor;
@@ -59,7 +60,8 @@ public class PluginLauncher implements Serializable {
 
 	private PluginLauncher() {
 		if (!ProcessUtil.isPluginProcess()) {
-			throw new IllegalAccessError("本类仅在插件进程使用");
+//			throw new IllegalAccessError("本类仅在插件进程使用");
+			Log.e("APF", "IllegalAccessError|本类仅在插件进程使用@init PluginLauncher");
 		}
 	}
 
