@@ -46,7 +46,8 @@ class PluginManagerImpl {
 
 	PluginManagerImpl() {
 		if (!ProcessUtil.isPluginProcess()) {
-			throw new IllegalAccessError("本类仅在插件进程使用");
+//			throw new IllegalAccessError("本类仅在插件进程使用");
+			Log.e("APF", "IllegalAccessError|本类仅在插件进程使用@init PluginManagerImpl");
 		}
 	}
 
