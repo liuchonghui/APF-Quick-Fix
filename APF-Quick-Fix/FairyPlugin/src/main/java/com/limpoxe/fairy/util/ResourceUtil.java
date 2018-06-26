@@ -165,7 +165,7 @@ public class ResourceUtil {
         final Class<?> rClazz;
         try {
             rClazz = cl.loadClass(packageName + ".R");
-        } catch (ClassNotFoundException e) {
+        } catch (Exception e) {
             LogUtil.d("No resource references to update in package " + packageName);
             return;
         }

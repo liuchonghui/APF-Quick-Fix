@@ -110,7 +110,7 @@ public class PluginClassLoader extends DexClassLoader {
 				for(DexClassLoader dexLoader : multiDexClassLoaderList) {
 					try {
 						clazz = dexLoader.loadClass(className);
-					} catch (ClassNotFoundException e) {
+					} catch (Exception e) {
 					}
 					if (clazz != null) {
 						break;
@@ -127,7 +127,7 @@ public class PluginClassLoader extends DexClassLoader {
 					if (plugin != null) {
 						try {
 							clazz = plugin.pluginClassLoader.loadClass(className);
-						} catch (ClassNotFoundException e) {
+						} catch (Exception e) {
 						}
 						if (clazz != null) {
 							break;
