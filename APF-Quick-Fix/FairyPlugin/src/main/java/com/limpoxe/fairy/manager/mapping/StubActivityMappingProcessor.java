@@ -90,6 +90,8 @@ public class StubActivityMappingProcessor implements StubMappingProcessor {
                         LogUtil.printException("StubActivityMappingProcessor.bindStub", e);
                     } catch (NoSuchFieldException e) {
                         LogUtil.printException("StubActivityMappingProcessor.bindStub", e);
+                    } catch (Throwable t) {
+                        LogUtil.printException("StubActivityMappingProcessor.bindStub", t);
                     }
                 } else {
                     LogUtil.e("插件尚未运行，无法获取pluginResource对象");

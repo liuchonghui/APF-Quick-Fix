@@ -180,7 +180,7 @@ public class PluginLauncher implements Serializable {
 		try {
 			HackActivityThread.installPackageInfo(FairyGlobal.getHostApplication(), pluginDescriptor.getPackageName(), pluginDescriptor,
 					pluginClassLoader, pluginRes, pluginApplication);
-		} catch (ClassNotFoundException e) {
+		} catch (Exception e) {
 			LogUtil.printException("PluginLauncher.initApplication", e);
 		}
 

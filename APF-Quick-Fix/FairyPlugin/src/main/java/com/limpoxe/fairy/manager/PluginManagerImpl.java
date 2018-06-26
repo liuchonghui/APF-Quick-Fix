@@ -381,7 +381,7 @@ class PluginManagerImpl {
 				ClassLoader cl = PluginCreator.createPluginClassLoader(pluginDescriptor.getInstalledPath(), pluginDescriptor.isStandalone(), null, null);
 				try {
 					cl.loadClass(Object.class.getName());
-				} catch (ClassNotFoundException e) {
+				} catch (Exception e) {
 					LogUtil.printException("PluginManagerImpl.installPlugin", e);
 				}
 				LogUtil.d("DEXOPT完毕");

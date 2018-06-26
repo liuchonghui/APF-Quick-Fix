@@ -13,6 +13,7 @@ import android.os.Build;
 import android.os.Bundle;
 import android.os.IBinder;
 import android.os.UserHandle;
+import android.util.Log;
 
 import com.limpoxe.fairy.content.PluginDescriptor;
 import com.limpoxe.fairy.core.android.HackContextImpl;
@@ -151,7 +152,8 @@ public class PluginInstrumentionWrapper extends Instrumentation {
 						//添加一个标记符
 						intent.addCategory(RELAUNCH_FLAG + className);
 					} else {
-						throw new ClassNotFoundException("pluginClassName : " + pluginClassName, new Throwable());
+//						throw new ClassNotFoundException("pluginClassName : " + pluginClassName, new Throwable());
+						Log.e("APF", "##ClassNotFound: pluginClassName : " + pluginClassName);
 					}
 				} else if (PluginProviderClient.isExact(className, PluginDescriptor.ACTIVITY)) {
 
@@ -218,7 +220,8 @@ public class PluginInstrumentionWrapper extends Instrumentation {
 						}
 					}
 					if (!found) {
-						throw new ClassNotFoundException("className : " + className + ", intent : " + intent.toString(), new Throwable());
+//						throw new ClassNotFoundException("className : " + className + ", intent : " + intent.toString(), new Throwable());
+						Log.e("APF", "##ClassNotFound: className : " + className + ", intent : " + intent.toString());
 					}
 				}
 			} else {
