@@ -18,6 +18,7 @@ public class FairyGlobal {
     private static boolean sIsNeedVerifyPluginSign = true;
     private static boolean sIsAllowDowngrade = true;
     private static ArrayList<StubMappingProcessor> mappingProcessors = new ArrayList<StubMappingProcessor>();
+    private static boolean sOnlyUseStandAlonePlugins = false;
 
     public static Application getHostApplication() {
         if (!isInited()) {
@@ -156,5 +157,21 @@ public class FairyGlobal {
             return sPluginFilter.accept(packageName1) || sPluginFilter.accept(packageName2);
         }
         return false;
+    }
+
+    public static void enableTimeLine() {
+        TimeLine.ENABLE = true;
+    }
+
+    public static void disableTimeLine() {
+        TimeLine.ENABLE = false;
+    }
+
+    public static void onlyUseStandAlonePlugins() {
+        sOnlyUseStandAlonePlugins = true;
+    }
+
+    public static boolean isOnlyUseStandAlonePlugins() {
+        return sOnlyUseStandAlonePlugins;
     }
 }
