@@ -75,15 +75,36 @@ public class PluginLoader {
         }
 
         TimeLine.set("AndroidAppIActivityManager.installProxy start");
-        AndroidAppIActivityManager.installProxy();
+        if (ProcessUtil.isPluginProcess()) {
+            AndroidAppIActivityManager.installProxy();
+        } else {
+            if (FairyGlobal.isEnableActivityManagerProxyInMainProcess()) {
+                // 宿主进程加载的目的是为了能在宿主里面查到一些插件信息--chonghui
+                AndroidAppIActivityManager.installProxy();
+            }
+        }
         TimeLine.set("AndroidAppIActivityManager.installProxy end");
 
         TimeLine.set("AndroidAppINotificationManager.installProxy start");
-        AndroidAppINotificationManager.installProxy();
+        if (ProcessUtil.isPluginProcess()) {
+            AndroidAppINotificationManager.installProxy();
+        } else {
+            if (FairyGlobal.isEnableNotificationManagerProxyInMainProcess()) {
+                // 宿主进程加载的目的是为了能在宿主里面查到一些插件信息--chonghui
+                AndroidAppINotificationManager.installProxy();
+            }
+        }
         TimeLine.set("AndroidAppINotificationManager.installProxy end");
 
         TimeLine.set("AndroidAppIPackageManager.installProxy start");
-        AndroidAppIPackageManager.installProxy(FairyGlobal.getHostApplication().getPackageManager());
+        if (ProcessUtil.isPluginProcess()) {
+            AndroidAppIPackageManager.installProxy(FairyGlobal.getHostApplication().getPackageManager());
+        } else {
+            if (FairyGlobal.isEnablePackageManagerProxyInMainProcess()) {
+                // 宿主进程加载的目的是为了能在宿主里面查到一些插件信息--chonghui
+                AndroidAppIPackageManager.installProxy(FairyGlobal.getHostApplication().getPackageManager());
+            }
+        }
         TimeLine.set("AndroidAppIPackageManager.installProxy end");
 
         if (isPluginProcess) {

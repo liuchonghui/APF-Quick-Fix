@@ -19,6 +19,9 @@ public class FairyGlobal {
     private static boolean sIsAllowDowngrade = true;
     private static ArrayList<StubMappingProcessor> mappingProcessors = new ArrayList<StubMappingProcessor>();
     private static boolean sOnlyUseStandAlonePlugins = false;
+    private static boolean sEnableActivityManagerProxyInMainProcess = true;
+    private static boolean sEnableNotificationManagerProxyInMainProcess = true;
+    private static boolean sEnablePackageManagerProxyInMainProcess = true;
 
     public static Application getHostApplication() {
         if (!isInited()) {
@@ -173,5 +176,41 @@ public class FairyGlobal {
 
     public static boolean isOnlyUseStandAlonePlugins() {
         return sOnlyUseStandAlonePlugins;
+    }
+
+    public static void enableActivityManagerProxyInMainProcess() {
+        sEnableActivityManagerProxyInMainProcess = true;
+    }
+
+    public static void disableActivityManagerProxyInMainProcess() {
+        sEnableActivityManagerProxyInMainProcess = false;
+    }
+
+    public static boolean isEnableActivityManagerProxyInMainProcess() {
+        return sEnableActivityManagerProxyInMainProcess;
+    }
+
+    public static void enableNotificationManagerProxyInMainProcess() {
+        sEnableNotificationManagerProxyInMainProcess = true;
+    }
+
+    public static void disableNotificationManagerProxyInMainProcess() {
+        sEnableNotificationManagerProxyInMainProcess = false;
+    }
+
+    public static boolean isEnableNotificationManagerProxyInMainProcess() {
+        return sEnableNotificationManagerProxyInMainProcess;
+    }
+
+    public static void enablePackageManagerProxyInMainProcess() {
+        sEnablePackageManagerProxyInMainProcess = true;
+    }
+
+    public static void disablePackageManagerProxyInMainProcess() {
+        sEnablePackageManagerProxyInMainProcess = false;
+    }
+
+    public static boolean isEnablePackageManagerProxyInMainProcess() {
+        return sEnablePackageManagerProxyInMainProcess;
     }
 }

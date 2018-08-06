@@ -14,7 +14,6 @@ public class TimeLine {
      */
     public static void set(String desc) {
         if (!ENABLE || desc == null || desc.length() == 0) {
-            Log.d(TAG, "unknown" + getOffsetFromLast());
             return;
         }
         if (!started) {
