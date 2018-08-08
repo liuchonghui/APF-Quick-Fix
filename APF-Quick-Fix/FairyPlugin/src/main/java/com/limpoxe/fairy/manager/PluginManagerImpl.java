@@ -215,7 +215,7 @@ class PluginManagerImpl {
         // 先将apk复制到宿主程序私有目录，防止在安装过程中文件被篡改
 		if (!srcPluginFile.startsWith(FairyGlobal.getHostApplication().getCacheDir().getAbsolutePath())) {
 			String tempFilePath = FairyGlobal.getHostApplication().getCacheDir().getAbsolutePath()
-					+ File.separator + System.currentTimeMillis() + ".apk";
+					+ File.separator + System.currentTimeMillis() + "_" + srcFile.getName() + ".apk";
 			if (FileUtil.copyFile(srcPluginFile, tempFilePath)) {
 				srcPluginFile = tempFilePath;
 			} else {
