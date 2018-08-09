@@ -1,14 +1,14 @@
 apply plugin: 'com.android.library'
 
 android {
-    compileSdkVersion 27
+    compileSdkVersion 28
     buildToolsVersion "27.0.1"
 
     defaultConfig {
         minSdkVersion 9
         targetSdkVersion 27
         versionCode 59
-        versionName "0.0.59.16-quickfix-mr-934e12d"
+        versionName "0.0.59.16-quickfix-mr-8a9c5ed"
     }
 
     lintOptions {
