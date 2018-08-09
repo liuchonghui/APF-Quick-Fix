@@ -2,14 +2,20 @@ package com.limpoxe.fairy.core;
 
 import android.app.Application;
 import android.content.pm.ActivityInfo;
+import android.content.res.AssetManager;
+import android.content.res.XmlResourceParser;
+import android.os.Bundle;
 import android.text.TextUtils;
 
 import com.limpoxe.fairy.content.PluginActivityInfo;
 import com.limpoxe.fairy.content.PluginDescriptor;
 import com.limpoxe.fairy.content.PluginIntentFilter;
 import com.limpoxe.fairy.content.PluginProviderInfo;
+import com.limpoxe.fairy.core.FairyGlobal;
+import com.limpoxe.fairy.core.android.HackAssetManager;
 import com.limpoxe.fairy.util.LogUtil;
 import com.limpoxe.fairy.util.ManifestReader;
+import com.limpoxe.fairy.util.ResourceUtil;
 
 import org.xmlpull.v1.XmlPullParser;
 import org.xmlpull.v1.XmlPullParserException;
@@ -28,14 +34,10 @@ public class PluginManifestParser {
 	public static PluginDescriptor parseManifest(String pluginPath) {
         ZipFile zipFile = null;
         try {
-            zipFile = new ZipFile(new File(pluginPath), ZipFile.OPEN_READ);
-            ZipEntry manifestXmlEntry = zipFile.getEntry(ManifestReader.DEFAULT_XML);
-        	String manifestXml = ManifestReader.getManifestXMLFromAPK(zipFile, manifestXmlEntry);
-        	
-            XmlPullParserFactory factory = XmlPullParserFactory.newInstance();
-            factory.setNamespaceAware(true);
-            XmlPullParser parser = factory.newPullParser();
-            parser.setInput(new StringReader(manifestXml));
+            AssetManager assetManager = AssetManager.class.newInstance();
+            new HackAssetManager(assetManager).addAssetPath(pluginPath);
+            XmlResourceParser parser = assetManager.openXmlResourceParser("AndroidManifest.xml");
+
             int eventType = parser.getEventType();
             String namespaceAndroid = null;
             String packageName = null;
@@ -52,7 +54,10 @@ public class PluginManifestParser {
                         String tag = parser.getName();
                         if ("manifest".equals(tag)) {
                         	
-                            namespaceAndroid = parser.getNamespace("android");
+                            namespaceAndroid = parser.getAttributeNamespace(0);
+                            if (TextUtils.isEmpty(namespaceAndroid)) {
+                                namespaceAndroid = "http://schemas.android.com/apk/res/android";
+                            }
                             
                             packageName = parser.getAttributeValue(null, "package");
                             String useHostPackageName = parser.getAttributeValue(null, "useHostPackageName");
@@ -173,7 +178,7 @@ public class PluginManifestParser {
                             applicationName = getName(applicationName, packageName);
                             desciptor.setApplicationName(applicationName);
 
-                    		desciptor.setDescription(parser.getAttributeValue(namespaceAndroid, "label"));
+                    		desciptor.setDescription(ResourceUtil.covent2Hex(parser.getAttributeValue(namespaceAndroid, "label")));
 
                             //这里不解析主题，后面会通过packageManager查询
 
@@ -209,15 +214,15 @@ public class PluginManifestParser {
                                 pluginActivityInfo = new PluginActivityInfo();
                                 infos.put(name, pluginActivityInfo);
                             }
-                            pluginActivityInfo.setHardwareAccelerated(hardwareAccelerated);
-                            pluginActivityInfo.setImmersive(immersive);
+                            pluginActivityInfo.setHardwareAccelerated(ResourceUtil.covent2Hex(hardwareAccelerated));
+                            pluginActivityInfo.setImmersive(ResourceUtil.covent2Hex(immersive));
                             if (launchMode == null) {
                                 launchMode = String.valueOf(ActivityInfo.LAUNCH_MULTIPLE);
                             }
                             pluginActivityInfo.setLaunchMode(launchMode);
                             pluginActivityInfo.setName(name);
                             pluginActivityInfo.setScreenOrientation(screenOrientation);
-                            pluginActivityInfo.setTheme(theme);
+                            pluginActivityInfo.setTheme(ResourceUtil.covent2Hex(theme));
                             pluginActivityInfo.setWindowSoftInputMode(windowSoftInputMode);
                             pluginActivityInfo.setUiOptions(uiOptions);
                             if (configChanges != null) {
@@ -298,21 +303,17 @@ public class PluginManifestParser {
             e.printStackTrace();
         } catch (IOException e) {
             e.printStackTrace();
-        } finally {
-            if (zipFile != null) {
-                try {
-                    zipFile.close();
-                } catch (IOException e) {
-                    e.printStackTrace();
-                }
-            }
+        } catch (IllegalAccessException e) {
+            e.printStackTrace();
+        } catch (InstantiationException e) {
+            e.printStackTrace();
         }
         
         return null;
     }
     
 	private static String addIntentFilter(HashMap<String, ArrayList<PluginIntentFilter>> map, String packageName, String namespace,
-			XmlPullParser parser, String endTagName) throws XmlPullParserException, IOException {
+                                          XmlResourceParser parser, String endTagName) throws XmlPullParserException, IOException {
 		int eventType = parser.getEventType();
 		String activityName = parser.getAttributeValue(namespace, "name");
 		activityName = getName(activityName, packageName);
@@ -332,7 +333,7 @@ public class PluginManifestParser {
 						intentFilter = new PluginIntentFilter();
 						filters.add(intentFilter);
 					} else {
-						intentFilter.readFromXml(tag, parser);
+						intentFilter.readFromXml(tag, namespace, parser);
 					}
 				}
 			}
