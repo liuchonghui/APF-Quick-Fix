@@ -195,7 +195,7 @@ public class PluginIntentResolver {
 			PluginActivityInfo pluginActivityInfo = pluginDescriptor.getActivityInfos().get(className);
 
 			String stubActivityName = PluginProviderClient.bindStubActivity(className,
-					Integer.parseInt(pluginActivityInfo.getLaunchMode()),
+					(int)Long.parseLong(pluginActivityInfo.getLaunchMode()),
 					pluginDescriptor.getPackageName(),
 					pluginActivityInfo.getTheme(),
                     pluginActivityInfo.getScreenOrientation());
@@ -203,7 +203,7 @@ public class PluginIntentResolver {
             if (stubActivityName == null) {
                 LogUtil.e("绑定StubAtivity失败",
                         className,
-                        Integer.parseInt(pluginActivityInfo.getLaunchMode()),
+                        (int)Long.parseLong(pluginActivityInfo.getLaunchMode()),
                         pluginDescriptor.getPackageName(),
                         pluginActivityInfo.getTheme(),
                         pluginActivityInfo.getScreenOrientation());

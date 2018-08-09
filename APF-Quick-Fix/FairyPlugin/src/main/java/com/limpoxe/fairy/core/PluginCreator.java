@@ -145,7 +145,15 @@ public class PluginCreator {
 				String[] assetPaths = buildAssetPath(isStandalone, mainApkPath,
 						absolutePluginApkPath, dependencies);
 				AssetManager assetMgr = AssetManager.class.newInstance();
-				new HackAssetManager(assetMgr).addAssetPaths(assetPaths);
+				HackAssetManager hackAssetManager = new HackAssetManager(assetMgr);
+				for(String path : assetPaths) {
+					hackAssetManager.addAssetPath(path);
+				}
+
+				// Kitkat needs this method call, Lollipop doesn't. However, it doesn't seem to cause any harm
+				// in L, so we do it unconditionally.
+				hackAssetManager.ensureStringBlocks();
+
 				Resources pluginRes = new PluginResourceWrapper(assetMgr, mainRes.getDisplayMetrics(),
 						mainRes.getConfiguration(), pluginDescriptor);
 

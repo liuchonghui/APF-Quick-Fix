@@ -46,10 +46,12 @@ public class PluginInstrumentionWrapper extends Instrumentation {
 	private static final String RELAUNCH_FLAG = "relaunch.category.";
 
 	private final HackInstrumentation hackInstrumentation;
+	private Instrumentation real;
 	private PluginActivityMonitor monitor;
 
 	public PluginInstrumentionWrapper(Instrumentation instrumentation) {
 		this.hackInstrumentation = new HackInstrumentation(instrumentation);
+		this.real = instrumentation;
 		this.monitor = new PluginActivityMonitor();
 	}
 
@@ -60,7 +62,7 @@ public class PluginInstrumentionWrapper extends Instrumentation {
 	@Override
 	public void callApplicationOnCreate(Application app) {
 		//此方法在application的attach之后被ActivityThread调用
-		super.callApplicationOnCreate(app);
+		real.callApplicationOnCreate(app);
 
 		//ContentProvider的相关操作应该放在installContentProvider之后执行,
 		//而installContentProvider是ActivityThread在调用application的attach之后,onCreate之前执行
@@ -86,7 +88,7 @@ public class PluginInstrumentionWrapper extends Instrumentation {
         } catch (Exception e1) {
             //
         }
-		return super.onException(obj, throwable);
+		return real.onException(obj, throwable);
 	}
 
 	@Override
@@ -99,7 +101,7 @@ public class PluginInstrumentionWrapper extends Instrumentation {
 				return instance().getRunningPlugin(pluginDescriptor.getPackageName()).pluginApplication;
 			}
 		}
-		return super.newApplication(cl, className, context);
+		return real.newApplication(cl, className, context);
 	}
 
 	@Override
@@ -238,7 +240,7 @@ public class PluginInstrumentionWrapper extends Instrumentation {
 		}
 
 		try {
-			return super.newActivity(cl, className, intent);
+			return real.newActivity(cl, className, intent);
 		} catch (ClassNotFoundException e) {
 			//收集状态，便于异常分析
 			throw new ClassNotFoundException(
@@ -303,7 +305,7 @@ public class PluginInstrumentionWrapper extends Instrumentation {
 			}
 		}
 
-		super.callActivityOnCreate(activity, icicle);
+		real.callActivityOnCreate(activity, icicle);
 
 		monitor.onActivityCreate(activity);
 
@@ -323,7 +325,7 @@ public class PluginInstrumentionWrapper extends Instrumentation {
 
 		monitor.onActivityDestory(activity);
 
-		super.callActivityOnDestroy(activity);
+		real.callActivityOnDestroy(activity);
 	}
 
 	@Override
@@ -334,7 +336,7 @@ public class PluginInstrumentionWrapper extends Instrumentation {
 			savedInstanceState.setClassLoader(activity.getClassLoader());
 		}
 
-		super.callActivityOnRestoreInstanceState(activity, savedInstanceState);
+		real.callActivityOnRestoreInstanceState(activity, savedInstanceState);
 	}
 
 	@Override
@@ -345,7 +347,7 @@ public class PluginInstrumentionWrapper extends Instrumentation {
 			icicle.setClassLoader(activity.getClassLoader());
 		}
 
-		super.callActivityOnPostCreate(activity, icicle);
+		real.callActivityOnPostCreate(activity, icicle);
 	}
 
 	@Override
@@ -356,25 +358,25 @@ public class PluginInstrumentionWrapper extends Instrumentation {
 			intent.setExtrasClassLoader(activity.getClassLoader());
 		}
 
-		super.callActivityOnNewIntent(activity, intent);
+		real.callActivityOnNewIntent(activity, intent);
 	}
 
 	@Override
 	public void callActivityOnStart(Activity activity) {
 		PluginInjector.injectInstrumetionFor360Safe(activity, this);
-		super.callActivityOnStart(activity);
+		real.callActivityOnStart(activity);
 	}
 
 	@Override
 	public void callActivityOnRestart(Activity activity) {
 		PluginInjector.injectInstrumetionFor360Safe(activity, this);
-		super.callActivityOnRestart(activity);
+		real.callActivityOnRestart(activity);
 	}
 
 	@Override
 	public void callActivityOnResume(Activity activity) {
 		PluginInjector.injectInstrumetionFor360Safe(activity, this);
-		super.callActivityOnResume(activity);
+		real.callActivityOnResume(activity);
 
 		monitor.onActivityResume(activity);
 	}
@@ -382,7 +384,7 @@ public class PluginInstrumentionWrapper extends Instrumentation {
 	@Override
 	public void callActivityOnStop(Activity activity) {
 		PluginInjector.injectInstrumetionFor360Safe(activity, this);
-		super.callActivityOnStop(activity);
+		real.callActivityOnStop(activity);
 	}
 
 	@Override
@@ -393,13 +395,13 @@ public class PluginInstrumentionWrapper extends Instrumentation {
 			outState.setClassLoader(activity.getClassLoader());
 		}
 
-		super.callActivityOnSaveInstanceState(activity, outState);
+		real.callActivityOnSaveInstanceState(activity, outState);
 	}
 
 	@Override
 	public void callActivityOnPause(Activity activity) {
 		PluginInjector.injectInstrumetionFor360Safe(activity, this);
-		super.callActivityOnPause(activity);
+		real.callActivityOnPause(activity);
 
 		monitor.onActivityPause(activity);
 	}
@@ -407,7 +409,7 @@ public class PluginInstrumentionWrapper extends Instrumentation {
 	@Override
 	public void callActivityOnUserLeaving(Activity activity) {
 		PluginInjector.injectInstrumetionFor360Safe(activity, this);
-		super.callActivityOnUserLeaving(activity);
+		real.callActivityOnUserLeaving(activity);
 	}
 
 	public ActivityResult execStartActivity(Context who, IBinder contextThread, IBinder token, Activity target,
