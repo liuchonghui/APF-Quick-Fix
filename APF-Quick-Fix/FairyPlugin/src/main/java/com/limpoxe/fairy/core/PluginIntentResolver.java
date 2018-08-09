@@ -125,6 +125,7 @@ public class PluginIntentResolver {
 
                     // HostClassLoader检测到这个特殊标记后会进行替换，得到真实的className
                     intent.setComponent(new ComponentName(intent.getComponent().getPackageName(), CLASS_PREFIX_RECEIVER + realReceiverClassName));
+                    hackReceiverData.getInfo().name = intent.getComponent().getClassName();
 
                     if (Build.VERSION.SDK_INT >= 21) {
                         if (intent.getExtras() != null) {
