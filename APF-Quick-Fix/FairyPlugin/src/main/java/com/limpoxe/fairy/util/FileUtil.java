@@ -1,10 +1,12 @@
 package com.limpoxe.fairy.util;
 
 import android.Manifest;
+import android.content.pm.ApplicationInfo;
 import android.content.pm.PackageManager;
 import android.os.Build;
 import android.os.Environment;
 import android.os.Looper;
+import android.util.Log;
 import android.widget.Toast;
 
 import com.limpoxe.fairy.core.FairyGlobal;
@@ -43,6 +45,15 @@ public class FileUtil {
 	public static boolean copyFile(final InputStream inputStream, String dest) {
 		LogUtil.d("copyFile to " + dest);
 
+		try {
+			ApplicationInfo info = FairyGlobal.getHostApplication().getApplicationInfo();
+			String a = info.nativeLibraryDir;
+			Object b = RefInvoker.getField(info, ApplicationInfo.class, "nativeLibraryDir");
+			Object c = RefInvoker.getField(info, ApplicationInfo.class, "primaryCpuAbi");
+			Log.d("PPP", "a=" + a + ",b=" + b + ",c=" + c);
+		} catch (Throwable t) {
+			t.printStackTrace();
+		}
 		if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
 			if (dest.startsWith(Environment.getExternalStorageDirectory().getAbsolutePath())) {
 				int permissionState = FairyGlobal.getHostApplication().checkSelfPermission(Manifest.permission.WRITE_EXTERNAL_STORAGE);
