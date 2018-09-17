@@ -124,6 +124,95 @@
             </intent-filter>
         </service>
 
+        <service
+            android:name="${applicationId}.stub.PluginStubService10"
+            android:process=":plugin">
+            <intent-filter>
+                <action android:name="${applicationId}.STUB_DEFAULT" />
+                <category android:name="android.intent.category.DEFAULT" />
+            </intent-filter>
+        </service>
+
+        <service
+            android:name="${applicationId}.stub.PluginStubService11"
+            android:process=":plugin">
+            <intent-filter>
+                <action android:name="${applicationId}.STUB_DEFAULT" />
+                <category android:name="android.intent.category.DEFAULT" />
+            </intent-filter>
+        </service>
+
+        <service
+            android:name="${applicationId}.stub.PluginStubService12"
+            android:process=":plugin">
+            <intent-filter>
+                <action android:name="${applicationId}.STUB_DEFAULT" />
+                <category android:name="android.intent.category.DEFAULT" />
+            </intent-filter>
+        </service>
+
+        <service
+            android:name="${applicationId}.stub.PluginStubService13"
+            android:process=":plugin">
+            <intent-filter>
+                <action android:name="${applicationId}.STUB_DEFAULT" />
+                <category android:name="android.intent.category.DEFAULT" />
+            </intent-filter>
+        </service>
+
+        <service
+            android:name="${applicationId}.stub.PluginStubService14"
+            android:process=":plugin">
+            <intent-filter>
+                <action android:name="${applicationId}.STUB_DEFAULT" />
+                <category android:name="android.intent.category.DEFAULT" />
+            </intent-filter>
+        </service>
+
+        <service
+            android:name="${applicationId}.stub.PluginStubService15"
+            android:process=":plugin">
+            <intent-filter>
+                <action android:name="${applicationId}.STUB_DEFAULT" />
+                <category android:name="android.intent.category.DEFAULT" />
+            </intent-filter>
+        </service>
+
+        <service
+            android:name="${applicationId}.stub.PluginStubService16"
+            android:process=":plugin">
+            <intent-filter>
+                <action android:name="${applicationId}.STUB_DEFAULT" />
+                <category android:name="android.intent.category.DEFAULT" />
+            </intent-filter>
+        </service>
+
+        <service
+            android:name="${applicationId}.stub.PluginStubService17"
+            android:process=":plugin">
+            <intent-filter>
+                <action android:name="${applicationId}.STUB_DEFAULT" />
+                <category android:name="android.intent.category.DEFAULT" />
+            </intent-filter>
+        </service>
+
+        <service
+            android:name="${applicationId}.stub.PluginStubService18"
+            android:process=":plugin">
+            <intent-filter>
+                <action android:name="${applicationId}.STUB_DEFAULT" />
+                <category android:name="android.intent.category.DEFAULT" />
+            </intent-filter>
+        </service>
+
+        <service
+            android:name="${applicationId}.stub.PluginStubService19"
+            android:process=":plugin">
+            <intent-filter>
+                <action android:name="${applicationId}.STUB_DEFAULT" />
+                <category android:name="android.intent.category.DEFAULT" />
+            </intent-filter>
+        </service>
 
         <!--
             对Activity的类全名没有要求，可随意指定，框架中是通过action来查询。
