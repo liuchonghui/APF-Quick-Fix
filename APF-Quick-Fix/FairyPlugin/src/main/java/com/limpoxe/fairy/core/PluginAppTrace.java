@@ -6,6 +6,7 @@ import android.content.res.Configuration;
 import android.os.Handler;
 import android.os.IBinder;
 import android.os.Message;
+import android.util.Log;
 
 import com.limpoxe.fairy.content.LoadedPlugin;
 import com.limpoxe.fairy.content.PluginDescriptor;
@@ -46,6 +47,10 @@ public class PluginAppTrace implements Handler.Callback {
 
 			LogUtil.v(">>> done: " + CodeConst.codeToString(msg.what));
 
+		} catch (Throwable t) {
+			Log.d("APF", "PluginAppTrace|handleMessage|catch exception:");
+			t.printStackTrace();
+			Log.d("APF", "PluginAppTrace|handleMessage|" + t.getMessage());
 		} finally {
 
 			afterHandle(msg, result);
